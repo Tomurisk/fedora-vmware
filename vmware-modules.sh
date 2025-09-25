@@ -13,7 +13,7 @@
 # Disable "Accelerate 3D graphics" on VMs – Mesa is too new on Fedora to work with VMware
 
 # You ABSOLUTELY SHOULD use QEMU (preferrably) or VirtualBox if you can.
-# Don't buy VMware besides using VMware Player for personal use.
+# Don't buy VMware products besides using VMware software for personal use.
 # Boycott Broadcom for rampant software enshittification and poor services.
 
 # VMware kernel module installer/uninstaller/hook configurator
