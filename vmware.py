@@ -48,7 +48,7 @@ finally:
 print("⏳ Downloading Linux .bundle file from TechPowerUp NL mirror...")
 response = requests.post(mirror_url, data={"id": hidden_id, "server_id": "27"})
 
-# Step 5: Save to home
+# Step 5: Save to ~/.vmware
 vmware_dir = os.path.join(os.path.expanduser("~"), ".vmware")
 os.makedirs(vmware_dir, exist_ok=True)
 bundle_path = os.path.join(vmware_dir, "vmware-workstation-linux.bundle")
