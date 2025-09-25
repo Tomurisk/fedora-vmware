@@ -17,7 +17,7 @@ update_vmware() {
 
     # Get current installed version using vmware -v
     if command -v vmware &>/dev/null; then
-        current_version=$(vmware -v | awk '{print $2}')
+        current_version=$(vmware -v | awk '{print $3}')
     else
         current_version="none"
     fi
