@@ -3,7 +3,7 @@
 ### Don't buy VMware products besides using VMware software for personal use.
 ### Boycott Broadcom for rampant software enshittification and poor services.
 
-A script that allows minimal effort setup of VMware Workstation on Fedora.
+A script that allows minimal effort setup of VMware Workstation and its modules on Fedora.
 
 # How to set everything up
 Make sure that Secure Boot is disabled on your computer.
@@ -24,4 +24,7 @@ If you have not installed VMware Workstation yet, you may only install the menti
 Run `vmware-modules.sh -h` – a hook will be set up, so modules are unloaded, rebuilt again, and reloaded on each upgrade.
 You may remove the hook by running `vmware-modules.sh -uh`.
 
-This repository is not responsible for the patches or guaranteeing their compatibility with kernel upgrades – it falls upon the (AUR package)[https://aur.archlinux.org/packages/vmware-workstation] maintainers. This method is set up to work with latest kernels that the AUR package supports, as such custom kernels (may/will) need manual polishing to work with this project.
+This repository is not responsible for the patches or guaranteeing their compatibility with kernel upgrades – it falls upon the [AUR package](https://aur.archlinux.org/packages/vmware-workstation) maintainers. This method is set up to work with latest kernels that the AUR package supports, as such custom kernels (may/will) need manual polishing to work with this project.
+
+# Creating new VMs
+Disable "Accelerate 3D graphics" on VMs – Mesa is too new on Fedora to work with VMware.
