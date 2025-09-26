@@ -26,5 +26,8 @@ You may remove the hook by running `vmware-modules.sh -uh`.
 
 This repository is not responsible for the patches or guaranteeing their compatibility with kernel upgrades – it falls upon the [AUR package](https://aur.archlinux.org/packages/vmware-workstation) maintainers. This method is set up to work with latest kernels that the AUR package supports, as such custom kernels (may/will) need manual polishing to work with this project.
 
+# Support for unstable kernels
+As of today, only stable branch is supported, as this project depends on the AUR package. However, this may or may not change in the future, depending on which direction its development is heading to.
+
 # Creating new VMs
 Disable "Accelerate 3D graphics" on VMs – Mesa is too new on Fedora to work with VMware.
