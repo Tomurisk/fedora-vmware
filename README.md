@@ -28,6 +28,7 @@ This repository is not responsible for the patches or guaranteeing their compati
 
 # Support for unstable kernels
 As of today, only stable branch is supported, as this project depends on the AUR package. However, this may or may not change in the future, depending on which direction its development is heading to.
+
 It essentially means that **beta versions of Fedora are not supported**, at least in the manner they're shipped out-of-the-box.
 
 # Creating new VMs
