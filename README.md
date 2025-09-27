@@ -21,7 +21,7 @@ If you have not installed VMware Workstation yet, you may only install the menti
 
 
 # (RECOMMENDED) Surviving kernel upgrades
-Run `vmware-modules.sh -h` – a hook will be set up, so modules are unloaded, rebuilt again, and reloaded on each upgrade.
+Run `vmware-modules.sh -h` – a hook will be set up, so modules are rebuilt again on each kernel upgrade.
 You may remove the hook by running `vmware-modules.sh -uh`.
 
 This repository is not responsible for the patches or guaranteeing their compatibility with kernel upgrades – it falls upon the [AUR package](https://aur.archlinux.org/packages/vmware-workstation) maintainers. This method is set up to work with latest kernels that the AUR package supports, as such custom kernels (may/will) need manual polishing to work with this project.
