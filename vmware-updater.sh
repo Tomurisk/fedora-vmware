@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Required commands
-for cmd in curl grep; do
+for cmd in wget grep; do
     if ! command -v $cmd &> /dev/null; then
         echo "$cmd is required but not installed. Exiting."
         exit 1
@@ -23,11 +23,10 @@ update_vmware() {
     fi
 
     # Fetch PKGBUILD and extract latest version
-    pkgbuild=$(curl -sf "$PKGBUILD_URL")
-    if [ $? -ne 0 ] || [ -z "$pkgbuild" ]; then
+    pkgbuild=$(wget -q -T 5 -O - "$PKGBUILD_URL") || {
         echo "💥 Shit hit the fan. AUR is inaccessible. Try again later."
         return
-    fi
+    }
 
     pkgver=$(echo "$pkgbuild" | grep -Po '^pkgver=\K.*')
 
@@ -57,12 +56,10 @@ update_vmware() {
     # CDN_SRV="26"  # TechPowerUp US-9
     # CDN_SRV="27"  # TechPowerUp NL
 
-    curl -sfL -o "$BUNDLE_PATH" \
-     --data-raw "id=2914&server_id=27" \
-     --referer https://www.techpowerup.com/ \
-     'https://www.techpowerup.com/download/vmware-workstation-pro/'
+    BUNDLE_URL="https://www.techpowerup.com/download/vmware-workstation-pro/?id=2914&server_id=27"
+    wget -q -T 5 --referer="https://www.techpowerup.com/" -O "$BUNDLE_PATH" "$BUNDLE_URL"
 
-    if [ $? -ne 0 ] || [ ! -f "$BUNDLE_PATH" ]; then
+    if [ ! -f "$BUNDLE_PATH" ] || [ "$(stat -c%s "$BUNDLE_PATH")" -eq 0 ]; then
         echo "💥 Shit hit the fan. TechPowerUp NL server is inaccessible. Try again later."
         return
     fi
