@@ -109,6 +109,14 @@ fi
 # ─────────────────────────────────────────────
 # 🔨 Build & Install Logic
 # ─────────────────────────────────────────────
+
+# Check if remote is available
+echo "🌐 Checking if the repository is available"
+if ! git ls-remote https://aur.archlinux.org/vmware-workstation.git &>/dev/null; then
+  echo "❌ Repository is not available. Terminating script."
+  exit 1
+fi
+
 echo "📁 Creating temporary workspace..."
 TMP_DIR=$(mktemp -d)
 cd "$TMP_DIR"
