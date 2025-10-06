@@ -23,21 +23,37 @@ update_vmware() {
     fi
 
     # Fetch PKGBUILD and extract latest version
-    pkgbuild=$(curl -s "$PKGBUILD_URL")
-    pkgver=$(echo "$pkgbuild" | grep -Po '^pkgver=\K.*')
-
-    if [ "$current_version" == "$pkgver" ]; then
-        echo "VMware Workstation $pkgver is already installed."
+    pkgbuild=$(curl -sf "$PKGBUILD_URL")
+    if [ $? -ne 0 ] || [ -z "$pkgbuild" ]; then
+        echo "💥 Shit hit the fan. AUR is inaccessible. Try again later."
         return
     fi
 
-    echo "🔄 New version available. Running Python downloader..."
-    rm -rf "$BUNDLE_PATH"
-    python3 "$(dirname "$0")/vmware.py"
+    pkgver=$(echo "$pkgbuild" | grep -Po '^pkgver=\K.*')
 
-    # Wait for download to complete
+    if [ "$current_version" == "$pkgver" ]; then
+        echo "✅ VMware Workstation $pkgver is already installed."
+        return
+    fi
+
+    # Fetch the bundle
+    echo "🔄 New version available. Downloading from TechPowerUp NL server..."
+    rm -rf "$BUNDLE_PATH"
+    mkdir -p "$(dirname "$BUNDLE_PATH")"
+
+    curl -sfL -o "$BUNDLE_PATH" \
+     --data-raw "id=2914&server_id=27" \
+     --referer https://www.techpowerup.com/ \
+     'https://www.techpowerup.com/download/vmware-workstation-pro/'
+
+    if [ $? -ne 0 ] || [ ! -f "$BUNDLE_PATH" ]; then
+        echo "💥 Shit hit the fan. TechPowerUp NL server is inaccessible. Try again later."
+        return
+    fi
+
+    # Verify download
     if [ ! -f "$BUNDLE_PATH" ]; then
-        echo "❌ Download failed or file not found in home directory."
+        echo "❌ Download failed or file not found at $BUNDLE_PATH."
         return
     fi
 

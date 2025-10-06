@@ -10,10 +10,10 @@ Make sure that Secure Boot is disabled on your computer.
 
 First of all, install the following packages:
 ```
-sudo dnf install kernel-devel gcc git patch python3-selenium chromedriver chromium curl grep
+sudo dnf install kernel-devel gcc git patch curl grep
 ```
 
-Then place both `vmware-updater.sh` and `vmware.py` in the same directory (can be any name, but the directory has to be the same). You should run that updater at least once a week.
+Then save `vmware-updater.sh` wherever you want. You should run that updater at least once a week.
 
 Now run `vmware-modules.sh` (from any directory).
 
