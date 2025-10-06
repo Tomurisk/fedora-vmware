@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Network check
+if ! ping -q -c 1 -W 2 google.com >/dev/null; then
+    read -p "💥 No internet connection. Check your network and try again."
+    exit 1
+fi
+
 # Required commands
 for cmd in wget grep; do
     if ! command -v $cmd &> /dev/null; then
@@ -25,6 +31,7 @@ update_vmware() {
 
     pkgbuild=$(
       wget -q \
+        --tries=1 \
         --timeout=5 \
         --dns-timeout=3 \
         --connect-timeout=3 \
@@ -66,6 +73,7 @@ update_vmware() {
     BUNDLE_URL="https://www.techpowerup.com/download/vmware-workstation-pro/?id=2914&server_id=27"
 
     wget -q \
+      --tries=1 \
       --timeout=5 \
       --dns-timeout=3 \
       --connect-timeout=3 \
@@ -77,7 +85,6 @@ update_vmware() {
         echo "💥 Shit hit the fan. TechPowerUp NL server is inaccessible. Try again later."
         return
     fi
-
 
     # Verify download
     if [ ! -f "$BUNDLE_PATH" ]; then
