@@ -8,9 +8,9 @@ A script that allows minimal effort setup of VMware Workstation and its modules 
 # How to set everything up
 Make sure that Secure Boot is disabled on your computer.
 
-First of all, install the following packages:
+First of all, upgrade your kernel to the latest version, and install the following packages:
 ```
-sudo dnf install "kernel-devel-$(uname -r)" gcc git patch wget grep
+sudo dnf install kernel-devel gcc git patch wget grep
 ```
 
 Then save `vmware-updater.sh` wherever you want. You should run that updater at least once a week.
