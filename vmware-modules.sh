@@ -92,6 +92,7 @@ if $UNINSTALL; then
 
     if lsmod | grep -q vmmon || lsmod | grep -q vmnet; then
         echo "❌ Modules still loaded. Aborting cleanup."
+        sudo systemctl start vmware
         exit 1
     fi
 
@@ -109,8 +110,6 @@ fi
 # ─────────────────────────────────────────────
 # 🔨 Build & Install Logic
 # ─────────────────────────────────────────────
-
-# Check if remote is available
 echo "🌐 Checking if the repository is available"
 if ! git ls-remote https://aur.archlinux.org/vmware-workstation.git &>/dev/null; then
   echo "❌ Repository is not available. Terminating script."
