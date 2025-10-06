@@ -8,6 +8,7 @@ for cmd in wget grep; do
     fi
 done
 
+# 🔄 Function to update VMware
 update_vmware() {
     echo "==> Updating VMware Workstation..."
 
@@ -22,10 +23,16 @@ update_vmware() {
         current_version="none"
     fi
 
-    # Fetch PKGBUILD and extract latest version
-    pkgbuild=$(wget -q -T 5 -O - "$PKGBUILD_URL") || {
-        echo "💥 Shit hit the fan. AUR is inaccessible. Try again later."
-        return
+    pkgbuild=$(
+      wget -q \
+        --timeout=5 \
+        --dns-timeout=3 \
+        --connect-timeout=3 \
+        --read-timeout=5 \
+        -O - "$PKGBUILD_URL"
+    ) || {
+      echo "💥 Shit hit the fan. AUR is inaccessible. Try again later."
+      return
     }
 
     pkgver=$(echo "$pkgbuild" | grep -Po '^pkgver=\K.*')
@@ -57,12 +64,20 @@ update_vmware() {
     # CDN_SRV="27"  # TechPowerUp NL
 
     BUNDLE_URL="https://www.techpowerup.com/download/vmware-workstation-pro/?id=2914&server_id=27"
-    wget -q -T 5 --referer="https://www.techpowerup.com/" -O "$BUNDLE_PATH" "$BUNDLE_URL"
+
+    wget -q \
+      --timeout=5 \
+      --dns-timeout=3 \
+      --connect-timeout=3 \
+      --read-timeout=5 \
+      --referer="https://www.techpowerup.com/" \
+      -O "$BUNDLE_PATH" "$BUNDLE_URL"
 
     if [ ! -f "$BUNDLE_PATH" ] || [ "$(stat -c%s "$BUNDLE_PATH")" -eq 0 ]; then
         echo "💥 Shit hit the fan. TechPowerUp NL server is inaccessible. Try again later."
         return
     fi
+
 
     # Verify download
     if [ ! -f "$BUNDLE_PATH" ]; then
