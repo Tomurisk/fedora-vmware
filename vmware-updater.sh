@@ -50,7 +50,7 @@ update_vmware() {
     fi
 
     # Fetch the bundle
-    echo "🔄 New version available. Downloading from TechPowerUp NL server..."
+    echo "🔄 New version available. Downloading from TechPowerUp..."
     rm -rf "$BUNDLE_PATH"
     mkdir -p "$(dirname "$BUNDLE_PATH")"
 
@@ -68,21 +68,15 @@ update_vmware() {
     # CDN_SRV="24"  # TechPowerUp US-10
     # CDN_SRV="25"  # TechPowerUp DE
     # CDN_SRV="26"  # TechPowerUp US-9
-    # CDN_SRV="27"  # TechPowerUp NL
+      CDN_SRV="27"  # TechPowerUp NL
 
-    BUNDLE_URL="https://www.techpowerup.com/download/vmware-workstation-pro/?id=2914&server_id=27"
+    wget --quiet --output-document="$BUNDLE_PATH" \
+         --header="Referer: https://www.techpowerup.com/" \
+         --post-data="id=2914&server_id=$CDN_SRV" \
+         'https://www.techpowerup.com/download/vmware-workstation-pro/'
 
-    wget -q \
-      --tries=1 \
-      --timeout=5 \
-      --dns-timeout=3 \
-      --connect-timeout=3 \
-      --read-timeout=5 \
-      --referer="https://www.techpowerup.com/" \
-      -O "$BUNDLE_PATH" "$BUNDLE_URL"
-
-    if [ ! -f "$BUNDLE_PATH" ] || [ "$(stat -c%s "$BUNDLE_PATH")" -eq 0 ]; then
-        echo "💥 Shit hit the fan. TechPowerUp NL server is inaccessible. Try again later."
+    if [ $? -ne 0 ] || [ ! -f "$BUNDLE_PATH" ]; then
+        echo "💥 Shit hit the fan. TechPowerUp server is inaccessible. Try again later."
         return
     fi
 
