@@ -41,6 +41,22 @@ update_vmware() {
     rm -rf "$BUNDLE_PATH"
     mkdir -p "$(dirname "$BUNDLE_PATH")"
 
+    # CDN Server Options
+    # CDN_SRV="3"   # TechPowerUp US-2
+    # CDN_SRV="5"   # TechPowerUp UK-1
+    # CDN_SRV="11"  # TechPowerUp US-4
+    # CDN_SRV="12"  # TechPowerUp US-5
+    # CDN_SRV="15"  # TechPowerUp SG
+    # CDN_SRV="16"  # TechPowerUp US-3
+    # CDN_SRV="19"  # TechPowerUp US-1
+    # CDN_SRV="20"  # TechPowerUp US-7
+    # CDN_SRV="21"  # TechPowerUp US-8
+    # CDN_SRV="22"  # TechPowerUp UK-2
+    # CDN_SRV="24"  # TechPowerUp US-10
+    # CDN_SRV="25"  # TechPowerUp DE
+    # CDN_SRV="26"  # TechPowerUp US-9
+    # CDN_SRV="27"  # TechPowerUp NL
+
     curl -sfL -o "$BUNDLE_PATH" \
      --data-raw "id=2914&server_id=27" \
      --referer https://www.techpowerup.com/ \
