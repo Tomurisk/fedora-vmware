@@ -17,8 +17,7 @@ Then save `vmware-updater.sh` wherever you want. You should run that updater at 
 
 Now run `vmware-modules.sh` (from any directory).
 
-If you have not installed VMware Workstation yet, you may only install the mentioned packages above, and run `vmware-updater.sh`: this will install VMware Workstation on your Fedora system, as well as modules for current kernel. Please note, that you will still have to set up the hook manually, as described below.
-
+If you have not installed VMware Workstation yet, you may only install the mentioned packages above, and run `vmware-updater.sh`: this will install VMware Workstation on your Fedora system. Then you may run `vmware-modules.sh` to install the modules. Please note, that you will still have to set up the hook manually, as described below.
 
 # (RECOMMENDED) Surviving kernel upgrades
 Run `vmware-modules.sh -h` – a hook will be set up, so modules are rebuilt again on each kernel upgrade.

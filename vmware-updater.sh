@@ -95,21 +95,29 @@ update_vmware() {
         echo "✅ Checksum verified against PKGBUILD"
         chmod +x "$BUNDLE_PATH"
         sudo "$BUNDLE_PATH"
-        vmware-modules.sh -u
-        ret=$?
-        while [ $ret -eq 1 ]; do
-            echo
-            read -n 1 -p "⚠️  Fix the issues and press any key or 'q' to quit " key
-            echo
-
-            if [[ "$key" == "q" || "$key" == "Q" ]]; then
-                exit 1
-            fi
-
-            vmware-modules.sh -u
+        
+        # Check if vmware-modules.sh exists
+        if [ -f /usr/bin/vmware-modules.sh ]; then
+            /usr/bin/vmware-modules.sh -u
             ret=$?
-        done
-        vmware-modules.sh
+            while [ $ret -eq 1 ]; do
+                echo
+                read -n 1 -p "⚠️  Fix the issues and press any key or 'q' to quit " key
+                echo
+
+                if [[ "$key" == "q" || "$key" == "Q" ]]; then
+                    exit 1
+                fi
+
+                /usr/bin/vmware-modules.sh -u
+                ret=$?
+            done
+            /usr/bin/vmware-modules.sh
+        else
+            echo "⚠️  The script /usr/bin/vmware-modules.sh does not exist. Configure the hook."
+            exit 1
+        fi
+
     else
         echo "❌ Checksum mismatch. File may be corrupted or tampered."
         return
