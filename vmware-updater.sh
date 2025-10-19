@@ -120,6 +120,8 @@ update_vmware() {
 
     else
         echo "❌ Checksum mismatch. File may be corrupted or tampered."
+        echo "ℹ️  It could also be that TechPowerUp hasn't uploaded the latest one."
+        rm -rf "$BUNDLE_PATH"
         return
     fi
 }
