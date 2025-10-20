@@ -140,7 +140,12 @@ echo "📁 Renaming vmmon directory..."
 mv vmmon-only vmmon
 
 echo "🩹 Applying base patch to vmmon..."
-patch -p2 --read-only=ignore --directory=vmmon < "$TMP_DIR/vmware-workstation/vmmon.patch"
+vmmon_patch="$TMP_DIR/vmware-workstation/vmmon.patch"
+if [[ -f "$vmmon_patch" ]]; then
+    patch -p2 --read-only=ignore --directory=vmmon < "$vmmon_patch"
+else
+    echo "ℹ️ No vmmon.patch found. Skipping base patch for vmmon."
+fi
 
 patch_dir="$TMP_DIR/vmware-workstation"
 target_dir=vmmon
@@ -148,19 +153,35 @@ target_dir=vmmon
 echo "📜 Searching for applicable kernel patches..."
 patches=$(ls "$patch_dir"/linux*.patch 2>/dev/null | sed -n 's/.*linux\([0-9]\+_[0-9]\+\)\.patch/\1/p' | sort -t_ -k1,1n -k2,2n)
 
-for patch in $patches; do
-    if [[ "$patch" < "$KERNEL_VERSION_SHORT" || "$patch" == "$KERNEL_VERSION_SHORT" ]]; then
-        echo "🩹 Applying patch: linux${patch}.patch"
-        patch -p2 --read-only=ignore --directory="$target_dir" < "$patch_dir/linux${patch}.patch"
-    fi
-done
+if [[ -n "$patches" ]]; then
+    for patch in $patches; do
+        if [[ "$patch" < "$KERNEL_VERSION_SHORT" || "$patch" == "$KERNEL_VERSION_SHORT" ]]; then
+            patch_file="$patch_dir/linux${patch}.patch"
+            if [[ -f "$patch_file" ]]; then
+                echo "🩹 Applying patch: linux${patch}.patch"
+                patch -p2 --read-only=ignore --directory="$target_dir" < "$patch_file"
+            else
+                echo "⚠️ Patch file linux${patch}.patch not found. Skipping."
+            fi
+        fi
+    done
+else
+    echo "ℹ️ No kernel-specific patches found. Skipping patching step."
+fi
 
-echo "📁 Renaming patched directories..."
+echo "📁 Renaming patched vmmon directory..."
 mv vmmon vmmon-only
+
+echo "📁 Renaming vmnet directory..."
 mv vmnet-only vmnet
 
 echo "🩹 Applying base patch to vmnet..."
-patch -p2 --read-only=ignore --directory=vmnet < "$TMP_DIR/vmware-workstation/vmnet.patch"
+vmnet_patch="$TMP_DIR/vmware-workstation/vmnet.patch"
+if [[ -f "$vmnet_patch" ]]; then
+    patch -p2 --read-only=ignore --directory=vmnet < "$vmnet_patch"
+else
+    echo "ℹ️ No vmnet.patch found. Skipping base patch for vmnet."
+fi
 
 echo "📁 Renaming patched vmnet directory..."
 mv vmnet vmnet-only

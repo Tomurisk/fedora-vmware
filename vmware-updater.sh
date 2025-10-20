@@ -19,7 +19,7 @@ update_vmware() {
     echo "==> Updating VMware Workstation..."
 
     # Paths
-    BUNDLE_PATH="$HOME/.vmware/vmware-workstation-linux.bundle"
+    BUNDLE_PATH="$HOME/.vmware/vmware.bundle"
     PKGBUILD_URL="https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=vmware-workstation"
 
     # Get current installed version using vmware -v
@@ -88,41 +88,68 @@ update_vmware() {
 
     # Compute SHA256 checksum
     checksum=$(sha256sum "$BUNDLE_PATH" | awk '{print $1}')
-    echo "Downloaded file checksum: $checksum"
 
-    # Check if checksum exists in PKGBUILD
-    if echo "$pkgbuild" | grep -q "$checksum"; then
-        echo "✅ Checksum verified against PKGBUILD"
-        chmod +x "$BUNDLE_PATH"
-        sudo "$BUNDLE_PATH"
-        
-        # Check if vmware-modules.sh exists
-        if [ -f /usr/bin/vmware-modules.sh ]; then
-            /usr/bin/vmware-modules.sh -u
-            ret=$?
-            while [ $ret -eq 1 ]; do
-                echo
-                read -n 1 -p "⚠️  Fix the issues and press any key or 'q' to quit " key
-                echo
+    verify_and_run_bundle() {
+        echo "File checksum: $checksum"
+        echo "🔍 Verifying bundle against checksum..."
+        if echo "$pkgbuild" | grep -q "$checksum"; then
+            echo "✅ Checksum verified"
+            chmod +x "$BUNDLE_PATH"
+            sudo "$BUNDLE_PATH"
 
-                if [[ "$key" == "q" || "$key" == "Q" ]]; then
-                    exit 1
-                fi
-
+            if [ -f /usr/bin/vmware-modules.sh ]; then
                 /usr/bin/vmware-modules.sh -u
                 ret=$?
-            done
-            /usr/bin/vmware-modules.sh
+                while [ $ret -eq 1 ]; do
+                    echo
+                    read -n 1 -p "⚠️  Fix the issues and press any key or 'q' to quit " key
+                    echo
+                    [[ "$key" == "q" || "$key" == "Q" ]] && return 1
+                    /usr/bin/vmware-modules.sh -u
+                    ret=$?
+                done
+                /usr/bin/vmware-modules.sh
+            else
+                echo "⚠️  The script /usr/bin/vmware-modules.sh does not exist. Configure the hook."
+                return 1
+            fi
         else
-            echo "⚠️  The script /usr/bin/vmware-modules.sh does not exist. Configure the hook."
-            exit 1
+            rm -rf "$BUNDLE_PATH"
+            echo "❌ Checksum mismatch. File may be corrupted or tampered."
+            return 1
         fi
+    }
 
+    # Main logic
+    if echo "$pkgbuild" | grep -q "$checksum"; then
+        verify_and_run_bundle
     else
-        echo "❌ Checksum mismatch. File may be corrupted or tampered."
-        echo "ℹ️  It could also be that TechPowerUp hasn't uploaded the latest one."
         rm -rf "$BUNDLE_PATH"
-        return
+        echo "❌ Checksum mismatch. File may be corrupted or tampered."
+        echo "🤔 It could also be that TechPowerUp hasn't uploaded the latest one."
+        echo "ℹ️  You may also put the bundle yourself within:"
+        echo "   $BUNDLE_PATH."
+        echo "🤓 It will be verified against checksums."
+        read -n 1 -p "🦔 Press any key to quit, or 'm' for manual bundle. Place it before this. " user_choice
+        echo
+
+        if [[ "$user_choice" == "m" || "$user_choice" == "M" ]]; then
+            while true; do
+                if [ -f "$BUNDLE_PATH" ]; then
+                    checksum=$(sha256sum "$BUNDLE_PATH" | awk '{print $1}')
+                    verify_and_run_bundle
+                    break
+                else
+                    echo "❌ Manual bundle not found at "
+                    echo "   $BUNDLE_PATH."
+                    read -n 1 -p "📦 Place the bundle and press any key to retry, or 'q' to quit: " retry_key
+                    echo
+                    [[ "$retry_key" == "q" || "$retry_key" == "Q" ]] && return 1
+                fi
+            done
+        else
+            return 1
+        fi
     fi
 }
 
