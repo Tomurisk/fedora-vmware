@@ -24,7 +24,7 @@ update_vmware() {
 
     # Get current installed version using vmware -v
     if command -v vmware &>/dev/null; then
-        current_version=$(vmware -v | awk '{print $3}')
+        current_version=$(vmware -v | awk '{print $4}')
     else
         current_version="none"
     fi
@@ -42,10 +42,10 @@ update_vmware() {
       return
     }
 
-    pkgver=$(echo "$pkgbuild" | grep -Po '^pkgver=\K.*')
+    buildver=$(echo "$pkgbuild" | grep -Po '^_buildver=\K.*')
 
-    if [ "$current_version" == "$pkgver" ]; then
-        echo "✅ VMware Workstation $pkgver is already installed."
+    if [ "$current_version" == "$buildver" ]; then
+        echo "✅ VMware Workstation Build $buildver is already installed."
         return
     fi
 
