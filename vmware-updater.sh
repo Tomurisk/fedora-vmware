@@ -9,7 +9,7 @@ fi
 # Required commands
 for cmd in wget grep; do
     if ! command -v $cmd &> /dev/null; then
-        echo "$cmd is required but not installed. Exiting."
+        read -p "$cmd is required but not installed. Exiting."
         exit 1
     fi
 done
