@@ -13,7 +13,7 @@ First of all, upgrade your kernel to the latest version, and install the followi
 sudo dnf install kernel-devel gcc git patch wget grep
 ```
 
-Then save `vmware-updater.sh` wherever you want. You should run that updater at least once a week.
+Then save `vmw-updater.sh` wherever you want. You should run that updater at least once a week.
 
 Now run `vmware-modules.sh` (from any directory).
 
