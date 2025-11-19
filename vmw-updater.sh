@@ -26,7 +26,7 @@ check_processes() {
             done
             read -n 1 -s -p "Close them. Press 'n' to quit or any other key to continue..." key
             echo
-            [[ $key == 'n' ]] && { echo "Exiting the script."; exit 0; }
+            [[ $key == 'n' || "$key" == "N" ]] && { echo "Exiting the script."; exit 0; }
         else
             echo "All specified executables are closed."
             break
@@ -37,14 +37,14 @@ check_processes() {
 
 # Network check
 if ! ping -q -c 1 -W 2 google.com >/dev/null; then
-    read -p "💥 No internet connection. Check your network and try again."
+    read -n 1 -s -p "💥 No internet connection. Check your network and try again."
     exit 1
 fi
 
 # Required commands
 for cmd in wget grep; do
     if ! command -v $cmd &> /dev/null; then
-        read -p "$cmd is required but not installed. Exiting."
+        read -n 1 -s -p "$cmd is required but not installed. Exiting."
         exit 1
     fi
 done
@@ -92,7 +92,12 @@ update_vmware() {
     # Ensure the bundle exists
     while [ ! -f "$BUNDLE_PATH" ]; do
         echo "❌ Bundle not found at"
-    read -p "   $BUNDLE_PATH"
+        echo "   $BUNDLE_PATH"
+        echo "🤨 False call? Press any key or 'n' to quit"
+        read -n 1 -s key
+        if [[ "$key" == "n" || "$key" == "N" ]]; then
+            return 1
+        fi
     done
 
     # Compute SHA256 checksum
@@ -112,9 +117,9 @@ update_vmware() {
             ret=$?
             while [ $ret -eq 1 ]; do
                 echo
-                read -n 1 -p "⚠️  Fix the issues and press any key or 'q' to quit " key
+                read -n 1 -p "⚠️  Fix the issues and press any key or 'n' to quit " key
                 echo
-                [[ "$key" == "q" || "$key" == "Q" ]] && return 1
+                [[ "$key" == "n" || "$key" == "N" ]] && return 1
                 /usr/bin/vmware-modules.sh -u
                 ret=$?
             done
