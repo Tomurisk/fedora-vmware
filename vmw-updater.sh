@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Harden wget by default
+alias wget='wget --https-only --secure-protocol=TLSv1_2'
+
 # Process checking function
 check_processes() {
     local processes=("$@")
