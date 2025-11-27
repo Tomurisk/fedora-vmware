@@ -66,6 +66,8 @@ update_vmware() {
 
     pkgbuild=$(
       wget -q \
+        --https-only \
+        --secure-protocol=TLSv1_2 \
         --tries=1 \
         --timeout=5 \
         --dns-timeout=3 \
