@@ -25,7 +25,7 @@
 #   ./vmware-modules.sh -h                  → install script and configure install hook
 #   ./vmware-modules.sh -uh                 → configure uninstall hook
 
-set -e
+set -euo pipefail
 
 # ─────────────────────────────────────────────
 # 📦 Hook Setup: -h flag
