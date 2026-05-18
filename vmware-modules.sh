@@ -117,9 +117,9 @@ if ! git ls-remote https://aur.archlinux.org/vmware-workstation.git &>/dev/null;
 fi
 
 echo "📁 Creating temporary workspace..."
-TMP_DIR=$(mktemp -d)
-cd "$TMP_DIR"
-echo "🧪 Working in: $TMP_DIR"
+TEMP_DIR=$(mktemp -d)
+cd "$TEMP_DIR"
+echo "🧪 Working in: $TEMP_DIR"
 
 # Check if the tar files exist
 if [[ -f /usr/lib/vmware/modules/source/vmmon.tar && -f /usr/lib/vmware/modules/source/vmnet.tar ]]; then
@@ -129,25 +129,25 @@ if [[ -f /usr/lib/vmware/modules/source/vmmon.tar && -f /usr/lib/vmware/modules/
 else
     echo "⚠️  One or both of the files do not exist."
     echo "🧹 Cleaning up temporary workspace..."
-    rm -rf "$TMP_DIR"
+    rm -rf "$TEMP_DIR"
     exit 1
 fi
 
 echo "📥 Cloning vmware-workstation AUR repo..."
-git clone https://aur.archlinux.org/vmware-workstation.git "$TMP_DIR/vmware-workstation"
+git clone https://aur.archlinux.org/vmware-workstation.git "$TEMP_DIR/vmware-workstation"
 
 echo "📁 Renaming vmmon directory..."
 mv vmmon-only vmmon
 
 echo "🩹 Applying base patch to vmmon..."
-vmmon_patch="$TMP_DIR/vmware-workstation/vmmon.patch"
+vmmon_patch="$TEMP_DIR/vmware-workstation/vmmon.patch"
 if [[ -f "$vmmon_patch" ]]; then
     patch -p2 --read-only=ignore --directory=vmmon < "$vmmon_patch"
 else
     echo "ℹ️ No vmmon.patch found. Skipping base patch for vmmon."
 fi
 
-patch_dir="$TMP_DIR/vmware-workstation"
+patch_dir="$TEMP_DIR/vmware-workstation"
 target_dir=vmmon
 
 echo "📜 Searching for applicable kernel patches..."
@@ -176,7 +176,7 @@ echo "📁 Renaming vmnet directory..."
 mv vmnet-only vmnet
 
 echo "🩹 Applying base patch to vmnet..."
-vmnet_patch="$TMP_DIR/vmware-workstation/vmnet.patch"
+vmnet_patch="$TEMP_DIR/vmware-workstation/vmnet.patch"
 if [[ -f "$vmnet_patch" ]]; then
     patch -p2 --read-only=ignore --directory=vmnet < "$vmnet_patch"
 else
@@ -187,14 +187,14 @@ echo "📁 Renaming patched vmnet directory..."
 mv vmnet vmnet-only
 
 echo "🔨 Building vmmon module for $TARGET_KERNEL..."
-cd "$TMP_DIR/vmmon-only"
+cd "$TEMP_DIR/vmmon-only"
 make -j$(nproc) \
   KERNELRELEASE="$TARGET_KERNEL" \
   VM_UNAME="$TARGET_KERNEL" \
   HEADER_DIR="/lib/modules/$TARGET_KERNEL/build/include"
 
 echo "🔨 Building vmnet module for $TARGET_KERNEL..."
-cd "$TMP_DIR/vmnet-only"
+cd "$TEMP_DIR/vmnet-only"
 make -j$(nproc) \
   KERNELRELEASE="$TARGET_KERNEL" \
   VM_UNAME="$TARGET_KERNEL" \
@@ -202,7 +202,7 @@ make -j$(nproc) \
 
 echo "📁 Installing compiled modules..."
 sudo mkdir -p /lib/modules/$TARGET_KERNEL/extra/
-sudo cp "$TMP_DIR/vmmon-only/vmmon.ko" "$TMP_DIR/vmnet-only/vmnet.ko" /lib/modules/$TARGET_KERNEL/extra/
+sudo cp "$TEMP_DIR/vmmon-only/vmmon.ko" "$TEMP_DIR/vmnet-only/vmnet.ko" /lib/modules/$TARGET_KERNEL/extra/
 
 echo "🔄 Reloading module dependencies..."
 sudo depmod -a "$TARGET_KERNEL"
@@ -215,6 +215,6 @@ else
 fi
 
 echo "🧹 Cleaning up temporary workspace..."
-rm -rf "$TMP_DIR"
+rm -rf "$TEMP_DIR"
 
 echo "✅ VMware modules built and installed for kernel $TARGET_KERNEL."
