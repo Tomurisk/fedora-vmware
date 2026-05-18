@@ -45,14 +45,12 @@ if ! ping -q -c 1 -W 2 google.com >/dev/null; then
 fi
 
 # Required commands
-for cmd in git grep; do
+for cmd in wget grep; do
     if ! command -v $cmd &> /dev/null; then
         read -n 1 -s -p "$cmd is required but not installed. Exiting."
         exit 1
     fi
 done
-
-TEMP_DIR="$(mktemp -d)"
 
 # 🔄 Function to update VMware
 update_vmware() {
@@ -60,6 +58,7 @@ update_vmware() {
 
     # Paths
     BUNDLE_PATH="$HOME/.vmware/vmware.bundle"
+    PKGBUILD_URL="https://raw.githubusercontent.com/archlinux/aur/refs/heads/vmware-workstation/PKGBUILD"
 
     # Get current installed version using vmware -v
     if command -v vmware &>/dev/null; then
@@ -68,18 +67,20 @@ update_vmware() {
         current_version="none"
     fi
 
-    echo "🌐 Checking if the repository is available"
-    if ! git ls-remote https://aur.archlinux.org/vmware-workstation.git &>/dev/null; then
-      echo "❌ Repository is not available. Terminating script."
-      exit 1
-    fi
+    pkgbuild=$(
+      wget -q \
+        --tries=1 \
+        --timeout=5 \
+        --dns-timeout=3 \
+        --connect-timeout=3 \
+        --read-timeout=5 \
+        -O - "$PKGBUILD_URL"
+    ) || {
+      echo "💥 GitHub PKGBUILD not available."
+      return
+    }
 
-    echo "📥 Cloning vmware-workstation AUR repo..."
-    git clone https://aur.archlinux.org/vmware-workstation.git "$TEMP_DIR/vmware-workstation"
-
-    pkgbuild="$TEMP_DIR/vmware-workstation/PKGBUILD"
-    buildver=$(grep -Po '^_buildver=\K.*' "$pkgbuild")
-    rm -rf "$TEMP_DIR/"*
+    buildver=$(echo "$pkgbuild" | grep -Po '^_buildver=\K.*')
 
     if [ "$current_version" == "$buildver" ]; then
         echo "✅ VMware Workstation Build $buildver is already installed."

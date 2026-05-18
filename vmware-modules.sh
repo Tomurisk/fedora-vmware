@@ -111,7 +111,7 @@ fi
 # 🔨 Build & Install Logic
 # ─────────────────────────────────────────────
 echo "🌐 Checking if the repository is available"
-if ! git ls-remote https://aur.archlinux.org/vmware-workstation.git &>/dev/null; then
+if ! git ls-remote https://github.com/archlinux/aur &>/dev/null; then
   echo "❌ Repository is not available. Terminating script."
   exit 1
 fi
@@ -134,7 +134,7 @@ else
 fi
 
 echo "📥 Cloning vmware-workstation AUR repo..."
-git clone https://aur.archlinux.org/vmware-workstation.git "$TEMP_DIR/vmware-workstation"
+git clone --single-branch --branch vmware-workstation https://github.com/archlinux/aur "$TEMP_DIR/vmware-workstation"
 
 echo "📁 Renaming vmmon directory..."
 mv vmmon-only vmmon
