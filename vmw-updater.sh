@@ -140,7 +140,4 @@ update_vmware() {
 
 update_vmware
 
-# 🧹 Cleanup
-rm -rf "$TEMP_DIR"
-
 read -p Done
