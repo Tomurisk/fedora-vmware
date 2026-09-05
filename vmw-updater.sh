@@ -7,29 +7,27 @@ alias wget='wget --https-only --secure-protocol=TLSv1_2'
 check_processes() {
     local processes=("$@")
     while true; do
-        local running=false
         declare -A seen_execs=()
 
         for proc in "${processes[@]}"; do
-            # pgrep -f parodys visus procesus, kurie turi net ir pavadinima argumente pvz. adb -s genymotion-device-id shell
-            mapfile -t pids < <(pgrep -f "$proc")
-            if (( ${#pids[@]} > 0 )); then
-                running=true
-                for pid in "${pids[@]}"; do
-                    exec_name=$(ps -p "$pid" -o comm=)
-                    seen_execs["$exec_name"]=1
-                done
-            fi
+            # -x ensures exact match of the executable name (ignores arguments)
+            # -l outputs both the PID and the process name
+            while read -r pid name; do
+                if [[ -n "$name" ]]; then
+                    seen_execs["$name"]=1
+                fi
+            done < <(pgrep -l -x "$proc")
         done
 
-        if $running; then
+        # If the associative array is not empty, some processes are still running
+        if (( ${#seen_execs[@]} > 0 )); then
             echo "The following executables are still running:"
             for exec in "${!seen_execs[@]}"; do
                 echo " - $exec"
             done
             read -n 1 -s -p "Close them. Press 'n' to quit or any other key to continue..." key
             echo
-            [[ $key == 'n' || "$key" == "N" ]] && { echo "Exiting the script."; exit 0; }
+            [[ ${key,,} == 'n' ]] && { echo "Exiting the script."; exit 0; }
         else
             echo "All specified executables are closed."
             break
@@ -112,7 +110,7 @@ update_vmware() {
         echo "✅ Checksum verified"
         chmod +x "$BUNDLE_PATH"
         check_processes "vmware-vmx"
-        sudo pkill -f vmware
+        sudo pkill vmware
         sudo "$BUNDLE_PATH"
 
         if [ -f /usr/bin/vmware-modules.sh ]; then
