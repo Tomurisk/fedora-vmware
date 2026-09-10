@@ -6,45 +6,53 @@ alias wget='wget --https-only --secure-protocol=TLSv1_2'
 # Process checking function
 check_processes() {
     local processes=("$@")
+
     while true; do
         declare -A seen_execs=()
 
         for proc in "${processes[@]}"; do
-            # -x ensures exact match of the executable name (ignores arguments)
-            # -l outputs both the PID and the process name
+            # -x ensures exact matching of the executable name.
+            # -l outputs both the PID and process name.
             while read -r pid name; do
                 if [[ -n "$name" ]]; then
                     seen_execs["$name"]=1
                 fi
-            done < <(pgrep -l -x "$proc")
+            done < <(pgrep -x -l -- "${proc:0:15}")
         done
 
-        # If the associative array is not empty, some processes are still running
+        # If the associative array is not empty, some processes are still running.
         if (( ${#seen_execs[@]} > 0 )); then
             echo "The following executables are still running:"
+
             for exec in "${!seen_execs[@]}"; do
                 echo " - $exec"
             done
+
             read -n 1 -s -p "Close them. Press 'n' to quit or any other key to continue..." key
             echo
-            [[ ${key,,} == 'n' ]] && { echo "Exiting the script."; exit 0; }
+
+            if [[ ${key,,} == 'n' ]]; then
+                echo "Exiting the script."
+                exit 0
+            fi
         else
             echo "All specified executables are closed."
             break
         fi
+
         sleep 1
     done
 }
 
 # Network check
-if ! ping -q -c 1 -W 2 google.com >/dev/null; then
+if ! ping -q -c 1 -W 2 google.com &>/dev/null; then
     read -n 1 -s -p "💥 No internet connection. Check your network and try again."
     exit 1
 fi
 
 # Required commands
 for cmd in wget grep; do
-    if ! command -v $cmd &> /dev/null; then
+    if ! command -v $cmd &>/dev/null; then
         read -n 1 -s -p "$cmd is required but not installed. Exiting."
         exit 1
     fi
@@ -96,7 +104,7 @@ update_vmware() {
         echo "   $BUNDLE_PATH"
         echo "🤨 False call? Press any key or 'n' to quit"
         read -n 1 -s key
-        if [[ "$key" == "n" || "$key" == "N" ]]; then
+        if [[ ${key,,} == 'n' ]]; then
             return 1
         fi
     done
@@ -120,7 +128,7 @@ update_vmware() {
                 echo
                 read -n 1 -p "⚠️  Fix the issues and press any key or 'n' to quit " key
                 echo
-                [[ "$key" == "n" || "$key" == "N" ]] && return 1
+                [[ ${key,,} == 'n' ]] && return 1
                 /usr/bin/vmware-modules.sh -u
                 ret=$?
             done

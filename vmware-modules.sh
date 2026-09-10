@@ -215,6 +215,6 @@ else
 fi
 
 echo "🧹 Cleaning up temporary workspace..."
-rm -rf "$TEMP_DIR"
+[[ -n "$TEMP_DIR" && -d "$TEMP_DIR" ]] && rm -rf "$TEMP_DIR"
 
 echo "✅ VMware modules built and installed for kernel $TARGET_KERNEL."
